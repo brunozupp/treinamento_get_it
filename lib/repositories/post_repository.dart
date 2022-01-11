@@ -43,5 +43,100 @@ class PostRepository implements IPostRepository {
     }
   }
 
-  
+  @override
+  Future<bool> delete(int id) async {
+    
+    try {
+      
+      var response = await _restApiService.serviceApi.delete("https://jsonplaceholder.typicode.com/posts/$id");
+
+      if(response.statusCode != 200) {
+        throw RestException(
+          message: "Erro que não caiu no DioError e nem na Exception Geral - Post", 
+          statusCode: response.statusCode ?? 500
+        );
+      }
+
+      return true;
+
+    } on DioError catch (e) {
+        throw RestException(
+          message: "Erro que caiu no DioError - Post", 
+          statusCode: e.response?.statusCode ?? 500
+        );
+    } catch (e) {
+      throw RestException(
+        message: "Erro que caiu na Exception Geral - Post", 
+        statusCode: 500
+      );
+    }
+  }
+
+  @override
+  Future<Post> insert(Post post) async {
+    
+    try {
+
+      var map = post.toMap()..remove("id");
+      
+      var response = await _restApiService.serviceApi.delete(
+        "https://jsonplaceholder.typicode.com/posts",
+        data: map
+      );
+
+      if(response.statusCode != 201) {
+        throw RestException(
+          message: "Erro que não caiu no DioError e nem na Exception Geral - Post", 
+          statusCode: response.statusCode ?? 500
+        );
+      }
+
+      return Post.fromMap(response.data);
+
+    } on DioError catch (e) {
+        throw RestException(
+          message: "Erro que caiu no DioError - Post", 
+          statusCode: e.response?.statusCode ?? 500
+        );
+    } catch (e) {
+      throw RestException(
+        message: "Erro que caiu na Exception Geral - Post", 
+        statusCode: 500
+      );
+    }
+  }
+
+  @override
+  Future<Post> update(Post post) async {
+    
+    try {
+
+      var map = post.toMap();
+      
+      var response = await _restApiService.serviceApi.delete(
+        "https://jsonplaceholder.typicode.com/posts/${post.id}",
+        data: map
+      );
+
+      if(response.statusCode != 200) {
+        throw RestException(
+          message: "Erro que não caiu no DioError e nem na Exception Geral - Post", 
+          statusCode: response.statusCode ?? 500
+        );
+      }
+
+      return Post.fromMap(response.data);
+
+    } on DioError catch (e) {
+        throw RestException(
+          message: "Erro que caiu no DioError - Post", 
+          statusCode: e.response?.statusCode ?? 500
+        );
+    } catch (e) {
+      throw RestException(
+        message: "Erro que caiu na Exception Geral - Post", 
+        statusCode: 500
+      );
+    }
+  }
 }
