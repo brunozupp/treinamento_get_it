@@ -1,8 +1,9 @@
+import 'package:treinamento_get_it/controllers/controller_base.dart';
 import 'package:treinamento_get_it/exceptions/rest_exception.dart';
 import 'package:treinamento_get_it/pages/post/stores/post_list_store/post_list_store.dart';
 import 'package:treinamento_get_it/repositories/interfaces/i_post_repository.dart';
 
-class PostListController {
+class PostListController implements ControllerBase<PostListStore> {
 
   final IPostRepository _postRepository;
   final PostListStore _postListStore;
@@ -14,11 +15,13 @@ class PostListController {
   _postRepository = postRepository,
   _postListStore = postListStore;
 
+  @override
   PostListStore get store => _postListStore;
 
   Future<void> getAll() async {
 
     _postListStore.setLoading(true);
+    _postListStore.clearError();
 
     try {
 

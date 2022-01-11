@@ -11,7 +11,7 @@ class ServiceLocator {
     GetIt.I.registerSingleton<RestApiService>(RestApiService());
 
     GetIt.I.registerFactory<IPostRepository>(() => PostRepository(
-      restApiService: GetIt.I.get<RestApiService>()
+      restApiService: GetIt.I.get()
     ));
 
     GetIt.I.registerFactory<PostListStore>(() => PostListStore());

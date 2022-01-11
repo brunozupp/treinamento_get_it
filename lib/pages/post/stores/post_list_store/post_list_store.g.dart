@@ -102,6 +102,17 @@ mixin _$PostListStore on _PostListStoreBase, Store {
   }
 
   @override
+  void clearError() {
+    final _$actionInfo = _$_PostListStoreBaseActionController.startAction(
+        name: '_PostListStoreBase.clearError');
+    try {
+      return super.clearError();
+    } finally {
+      _$_PostListStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 posts: ${posts},

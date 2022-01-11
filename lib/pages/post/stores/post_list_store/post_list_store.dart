@@ -34,4 +34,10 @@ abstract class _PostListStoreBase with Store {
   void setError(String? value) {
     error = value;
   }
+
+  @action
+  void clearError() {
+    error = null;
+  }
+
 }
