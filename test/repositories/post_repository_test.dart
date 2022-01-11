@@ -62,6 +62,51 @@ void main() {
       );
     });
 
+    test("Should return a exception of the type RestException with the message 'Status code (432) não corresponde ao esperado (200)'", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.reply(432, null),
+      );
+
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(
+          predicate((error) => error is RestException && error.message == "Status code (432) não corresponde ao esperado (200)")
+        )
+      );
+    });
+
+    test("Should return a exception of the type RestException with the message 'Status code (432) não corresponde ao esperado (200)' and status code 432", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.reply(432, null),
+      );
+
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(
+          predicate((error) => error is RestException && error.statusCode == 432)
+        )
+      );
+    });
+
+    test("Should return a exception of the type RestException with the status code 432'", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.reply(432, null),
+      );
+
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(
+          predicate((error) => error is RestException && error.statusCode == 432)
+        )
+      );
+    });
+
     test("Should return a exception of the type RestException when the Http Client throws a exception of DioError", () async {
 
       dioAdapter.onGet(
@@ -72,7 +117,6 @@ void main() {
           )
         )),
       );
-      
       
       expect(
         () async => await postRepository.getAll(), 

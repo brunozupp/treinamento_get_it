@@ -21,20 +21,26 @@ class PostRepository implements IPostRepository {
       
       var response = await _restApiService.serviceApi.get("https://jsonplaceholder.typicode.com/posts");
 
-      if(response.statusCode != 200) {
-        throw RestException(
-          message: "Erro que não caiu no DioError e nem na Exception Geral - Post", 
-          statusCode: response.statusCode ?? 500
-        );
-      }
-
       return (response.data as List).map<Post>((e) => Post.fromMap(e)).toList();
+      
+      // Para testar as exceções
+      //return (response.data as List<Map<String,dynamic>>).map<Post>(Post.fromMap).toList();
 
     } on DioError catch (e) {
+      
+      if(e.response == null || e.response!.statusCode == null) {
         throw RestException(
           message: "Erro que caiu no DioError - Post", 
-          statusCode: e.response?.statusCode ?? 500
+          statusCode: 500
         );
+      }
+      
+      // TODO: Verificar as estruturas do Dio sobre status code e sua relação com o estouro de uma exceção DioError
+      throw RestException(
+        message: "Status code (${e.response!.statusCode}) não corresponde ao esperado (200)", 
+        statusCode: e.response!.statusCode!
+      );
+        
     } catch (e) {
       throw RestException(
         message: "Erro que caiu na Exception Geral - Post", 
