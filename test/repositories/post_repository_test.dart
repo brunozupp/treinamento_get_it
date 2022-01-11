@@ -10,7 +10,7 @@ void main() {
 
   const baseUrl = "https://jsonplaceholder.typicode.com/posts";
 
-  group("Testes unitários do método .getAll()", () {
+  group("Unit tests from method .getAll()", () {
 
     late final IPostRepository postRepository;
 
@@ -77,21 +77,6 @@ void main() {
       );
     });
 
-    test("Should return a exception of the type RestException with the message 'Status code (432) não corresponde ao esperado (200)' and status code 432", () async {
-
-      dioAdapter.onGet(
-        baseUrl,
-        (server) => server.reply(432, null),
-      );
-
-      expect(
-        () async => await postRepository.getAll(), 
-        throwsA(
-          predicate((error) => error is RestException && error.statusCode == 432)
-        )
-      );
-    });
-
     test("Should return a exception of the type RestException with the status code 432'", () async {
 
       dioAdapter.onGet(
@@ -107,11 +92,30 @@ void main() {
       );
     });
 
+    test("Should return a exception of the type RestException with the message 'Status code (432) não corresponde ao esperado (200)' and status code 432", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.reply(432, null),
+      );
+
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(
+          allOf([
+            isA<RestException>(),
+            predicate((RestException error) => error.message == "Status code (432) não corresponde ao esperado (200)"),
+            predicate((error) => error is RestException && error.statusCode == 432)
+          ])
+        )
+      );
+    });
+
     test("Should return a exception of the type RestException when the Http Client throws a exception of DioError", () async {
 
       dioAdapter.onGet(
         baseUrl,
-        (server) => server.throws(402, DioError(
+        (server) => server.throws(432, DioError(
           requestOptions: RequestOptions(
             path: baseUrl
           )
@@ -123,6 +127,83 @@ void main() {
         throwsA(isA<RestException>())
       );
     });
+
+    test("Should return a exception of the type RestException with the message 'Status code (432) não corresponde ao esperado (200)' and status code 432 when the Http Client throws a exception of DioError", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.throws(432, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl
+            ),
+            statusCode: 432
+          ),
+        )),
+      );
+      
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(allOf([
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Status code (432) não corresponde ao esperado (200)"),
+          predicate((error) => error is RestException && error.statusCode == 432)
+        ]))
+      );
+    });
+
+    test("Should return a exception of the type RestException with the message 'Erro que caiu no DioError - Post' and status code 500 when Response is null", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.throws(432, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          ),
+          response: null
+        )),
+      );
+      
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(
+          predicate(
+            (error) => error is RestException && error.message == "Erro que caiu no DioError - Post" && error.statusCode == 500
+          )
+        )
+      );
+    });
+
+    test("Should return a exception of the type RestException with the message 'Erro que caiu no DioError - Post' and statis code 500 when the Response is not null and status code is null", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.throws(432, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl
+            ),
+            statusCode: null
+          ),
+        )),
+      );
+      
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(
+          predicate(
+            (error) => error is RestException && error.message == "Erro que caiu no DioError - Post" && error.statusCode == 500
+          )
+        )
+      );
+    });
+
   });
 }
 
