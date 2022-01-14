@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:treinamento_get_it/exceptions/rest_exception.dart';
+import 'package:treinamento_get_it/models/entities/post.dart';
 import 'package:treinamento_get_it/repositories/interfaces/i_post_repository.dart';
 import 'package:treinamento_get_it/repositories/post_repository.dart';
 import 'package:treinamento_get_it/shared/rest_api/rest_api_service.dart';
@@ -10,20 +11,20 @@ void main() {
 
   const baseUrl = "https://jsonplaceholder.typicode.com/posts";
 
+  late final IPostRepository postRepository;
+
+  final restApiService = RestApiService();
+
+  final dioAdapter = DioAdapter(dio: restApiService.serviceApi);
+
+  setUpAll(() {
+
+    postRepository = PostRepository(
+      restApiService: restApiService
+    );
+  });
+
   group("Unit tests from method .getAll()", () {
-
-    late final IPostRepository postRepository;
-
-    final restApiService = RestApiService();
-
-    final dioAdapter = DioAdapter(dio: restApiService.serviceApi);
-
-    setUpAll(() {
-
-      postRepository = PostRepository(
-        restApiService: restApiService
-      );
-    });
 
     test("Should return a list of Posts when status code is 200", () async {
 
@@ -204,6 +205,332 @@ void main() {
       );
     });
 
+    test("Should return a exception of the type RestException with the message 'Erro que caiu na Exception Geral - Post' and status code 500 when is thrown a General Exception during the .fromMap()", () async {
+
+      dioAdapter.onGet(
+        baseUrl,
+        (server) => server.reply(200, [
+          {
+            "id": "fake"
+          }
+        ]),
+      );
+      
+      expect(
+        () async => await postRepository.getAll(), 
+        throwsA(allOf([
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu na Exception Geral - Post"),
+          predicate((error) => error is RestException && error.statusCode == 500)
+        ]))
+      );
+    });
+
+  });
+
+  group("Unit tests from method .get(id)", () {
+
+    test("Should return a object of type Post when status code from response is 200", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(200, posts.where((element) => element["id"] == id).first),
+      );
+
+      final post = await postRepository.get(id);
+
+      expect(post, isA<Post>());
+
+    });
+
+    test("Should return a Post object with id 1 when status code from response is 200", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(200, posts.where((element) => element["id"] == id).first),
+      );
+
+      final post = await postRepository.get(id);
+
+      expect(post.id, equals(id));
+
+    });
+
+    test("Should return a object of type Post and with id 1 when status code from response is 200", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(200, posts.where((element) => element["id"] == id).first),
+      );
+
+      final post = await postRepository.get(id);
+
+      expect(post, allOf([
+        isA<Post>(),
+        predicate((Post post) => post.id == id)
+      ]));
+
+    });
+
+    test("Should return a Exception of type RestException when status code from response is 404", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(404, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(isA<RestException>())
+      );
+    });
+
+    test("Should return a RestException with message 'Post não foi encontrado' when status code from response is 404", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(404, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(
+          predicate((RestException error) => error.message == 'Post não foi encontrado')
+        )
+      );
+    });
+
+    test("Should return a RestException with status code 404 when status code from response is 404", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(404, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(
+          predicate((RestException error) => error.statusCode == 404)
+        )
+      );
+    });
+
+    test("Should return a Exception of type RestException with status code 404 and message 'Post não foi encontrado' when status code from response is 404", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(404, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(
+          allOf([
+            isA<RestException>(),
+            predicate((RestException error) => error.message == 'Post não foi encontrado'),
+            predicate((RestException error) => error.statusCode == 404)
+          ])
+        )
+      );
+    });
+
+    test("Should return a Exception of type RestException when status code from response is different from 2xx", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(345, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(isA<RestException>())
+      );
+    });
+
+    test("Should return a RestException with status code 345 when status code from response is 345", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(345, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(
+          predicate((RestException error) => error.statusCode == 345)
+        )
+      );
+    });
+
+    test("Should return a RestException with message 'Status code (345) não corresponde ao esperado (200)' when status code from response is 345", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(345, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(
+          predicate((RestException error) => error.message == 'Status code (345) não corresponde ao esperado (200)')
+        )
+      );
+    });
+
+    test("Should return a Exception of type RestException with message 'Status code (345) não corresponde ao esperado (200)' and status code 345 when status code from response is 345", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(345, {}),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(
+          allOf(
+            isA<RestException>(),
+            predicate((RestException error) => error.message == 'Status code (345) não corresponde ao esperado (200)'),
+            predicate((RestException error) => error.statusCode == 345),
+          )
+        )
+      );
+    });
+
+    test("Should return a RestException when a DioError without a Response is thrown", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          )
+        )),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(isA<RestException>())
+      );
+    });
+
+    test("Should return a RestException with message 'Erro que caiu no DioError - Post' and status code 500 when a DioError without a Response is thrown", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          )
+        )),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(allOf(
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 500),
+        ))
+      );
+    });
+
+    test("Should return a RestException when a DioError with a Response without a status code is thrown", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl,
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl,
+            ),
+          ),
+        )),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(isA<RestException>())
+      );
+    });
+
+    test("Should return a RestException with message 'Erro que caiu no DioError - Post' and status code 500 when a DioError with a Response without status code is thrown", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl,
+            ),
+          ),
+        )),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(allOf(
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 500),
+        ))
+      );
+    });
+
+    test("Should return a RestException with message 'Erro que caiu na Exception Geral - Post' and status code 500 when a General Exception is thrown during .fromMap()", () async {
+
+      const id = 1;
+
+      dioAdapter.onGet(
+        baseUrl + "/$id",
+        (server) => server.reply(200, {
+          "id": "fake",
+        }),
+      );
+
+      expect(
+        () async => await postRepository.get(id), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu na Exception Geral - Post"),
+          predicate((RestException error) => error.statusCode == 500),
+        ))
+      );
+    });
+    
   });
 }
 

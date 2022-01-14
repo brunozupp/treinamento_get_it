@@ -145,4 +145,43 @@ class PostRepository implements IPostRepository {
       );
     }
   }
+
+  @override
+  Future<Post> get(int id) async {
+    
+    try {
+      
+      var response = await _restApiService.serviceApi.get("https://jsonplaceholder.typicode.com/posts/$id");
+
+      return Post.fromMap(response.data);
+      
+    } on DioError catch (e) {
+      
+      if(e.response == null || e.response!.statusCode == null) {
+        throw RestException(
+          message: "Erro que caiu no DioError - Post", 
+          statusCode: 500
+        );
+      }
+
+      if(e.response!.statusCode == 404) {
+        throw RestException(
+          message: "Post não foi encontrado", 
+          statusCode: e.response!.statusCode!
+        );
+      }
+      
+      // TODO: Verificar as estruturas do Dio sobre status code e sua relação com o estouro de uma exceção DioError
+      throw RestException(
+        message: "Status code (${e.response!.statusCode}) não corresponde ao esperado (200)", 
+        statusCode: e.response!.statusCode!
+      );
+        
+    } catch (e) {
+      throw RestException(
+        message: "Erro que caiu na Exception Geral - Post", 
+        statusCode: 500
+      );
+    }
+  }
 }
