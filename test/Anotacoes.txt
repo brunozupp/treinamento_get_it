@@ -1,0 +1,29 @@
+Lançando erros no DioError:
+
+- Pode ser usado de duas maneiras para cair no DioError:
+
+1 - uma é passar um "Status Code" diferente da faixa de 2xx: server.reply(324, {}),
+
+2 - lançar uma exceção explicita do DioError. server.throws(435, DioError(...))
+
+A diferença entre o 1 e 2 é a seguinte: no número 1 ele vai direto para o DioError caso a faixa seja diferente de 2xx, mas eu não possuo controle 
+sobre o Response dele, apenas preenche com o status code do atributo response do DioError e nada mais. Com o número 2, eu consigo lançar uma
+exceção DioError explicitamente, o que me garante manipular os atributos dele, principalmente o atributo 'response'. Vale ressaltar que o status
+code de server.throws(435, DioError(...)) não é válido, caso queira o status code no DioError é preciso passar explicitamente como
+no exemplo a seguir:
+
+    dioAdapter.onGet(
+        baseUrl,
+        (server) => server.throws(432, DioError( // o status code dessa linha não é válido
+          requestOptions: RequestOptions(
+            path: baseUrl
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl
+            ),
+            statusCode: 432 // o status coide dessa linha que é válido
+          ),
+        )),
+      );
+
