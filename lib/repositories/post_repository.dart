@@ -13,13 +13,15 @@ class PostRepository implements IPostRepository {
   }) {
     _restApiService = restApiService;
   }
+
+  final String _baseUrl = "https://jsonplaceholder.typicode.com/posts";
   
   @override
   Future<List<Post>> getAll() async {
     
     try {
       
-      var response = await _restApiService.serviceApi.get("https://jsonplaceholder.typicode.com/posts");
+      var response = await _restApiService.serviceApi.get(_baseUrl);
 
       return (response.data as List).map<Post>((e) => Post.fromMap(e)).toList();
       
@@ -54,7 +56,7 @@ class PostRepository implements IPostRepository {
     
     try {
       
-      var response = await _restApiService.serviceApi.delete("https://jsonplaceholder.typicode.com/posts/$id");
+      var response = await _restApiService.serviceApi.delete("$_baseUrl/$id");
 
       if(response.statusCode != 200) {
         throw RestException(
@@ -66,10 +68,18 @@ class PostRepository implements IPostRepository {
       return true;
 
     } on DioError catch (e) {
+
+      if(e.response != null && e.response!.statusCode == 404) {
         throw RestException(
-          message: "Erro que caiu no DioError - Post", 
-          statusCode: e.response?.statusCode ?? 500
+          message: "Post não foi encontrado", 
+          statusCode: 404
         );
+      }
+
+      throw RestException(
+        message: "Erro que caiu no DioError - Post", 
+        statusCode: e.response?.statusCode ?? 500
+      );
     } catch (e) {
       throw RestException(
         message: "Erro que caiu na Exception Geral - Post", 
@@ -86,7 +96,7 @@ class PostRepository implements IPostRepository {
       var map = post.toMap()..remove("id");
       
       var response = await _restApiService.serviceApi.delete(
-        "https://jsonplaceholder.typicode.com/posts",
+        _baseUrl,
         data: map
       );
 
@@ -120,7 +130,7 @@ class PostRepository implements IPostRepository {
       var map = post.toMap();
       
       var response = await _restApiService.serviceApi.delete(
-        "https://jsonplaceholder.typicode.com/posts/${post.id}",
+        "$_baseUrl/${post.id}",
         data: map
       );
 
@@ -151,7 +161,7 @@ class PostRepository implements IPostRepository {
     
     try {
       
-      var response = await _restApiService.serviceApi.get("https://jsonplaceholder.typicode.com/posts/$id");
+      var response = await _restApiService.serviceApi.get("$_baseUrl/$id");
 
       return Post.fromMap(response.data);
       

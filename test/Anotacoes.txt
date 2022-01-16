@@ -27,3 +27,7 @@ no exemplo a seguir:
         )),
       );
 
+- Lançando erros para cair no catch Geral
+
+1 - inserir informações erradas no data do response para ocorrer erro na serialização dos dados
+
