@@ -95,7 +95,7 @@ class PostRepository implements IPostRepository {
 
       var map = post.toMap()..remove("id");
       
-      var response = await _restApiService.serviceApi.delete(
+      var response = await _restApiService.serviceApi.post(
         _baseUrl,
         data: map
       );
@@ -129,7 +129,7 @@ class PostRepository implements IPostRepository {
 
       var map = post.toMap();
       
-      var response = await _restApiService.serviceApi.delete(
+      var response = await _restApiService.serviceApi.put(
         "$_baseUrl/${post.id}",
         data: map
       );
