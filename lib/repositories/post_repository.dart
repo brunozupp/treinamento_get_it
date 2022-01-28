@@ -109,6 +109,14 @@ class PostRepository implements IPostRepository {
 
       return Post.fromMap(response.data);
 
+    } on RestException {
+      
+      // Por conta que eu estou mandando um throw ali no try, ele não vai cair diretamente onde eu
+      // executei a função insert, na verdade ele vai cair aqui mesmo nos 'ONs' e para que eu propague
+      // a exceção para onde eu chamei a função eu preciso colocar o RestException na pilha de exceções
+      // a serem analisadas e colocar um rethrow para ele mandar para onde a função foi executada. 
+      rethrow;
+
     } on DioError catch (e) {
         throw RestException(
           message: "Erro que caiu no DioError - Post", 

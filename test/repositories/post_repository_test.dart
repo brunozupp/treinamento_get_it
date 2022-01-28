@@ -557,6 +557,25 @@ void main() {
 
     test("Should return a Exception from the type RestException with the message 'Erro que não caiu no DioError e nem na Exception Geral - Post' and status code 232 when the status code from Response is in the range of 2xx and different than 201", () {
 
+      final Post post = postsModel.first;
+
+      var map = post.toMap()..remove("id");
+
+      dioAdapter.onPost(
+        baseUrl, 
+        (server) => server.reply(232, post.toMap()),
+        data: map,
+      );
+
+      expect(
+        () async => await postRepository.insert(post), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que não caiu no DioError e nem na Exception Geral - Post"),
+          predicate((RestException error) => error.statusCode == 232),
+        ))
+      );
+
     });
 
     test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when the status code from Response is different from de range of 2xx", () {
