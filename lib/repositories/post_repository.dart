@@ -151,7 +151,10 @@ class PostRepository implements IPostRepository {
 
       return Post.fromMap(response.data);
 
-    } on DioError catch (e) {
+    } on RestException {
+      rethrow;
+    }
+     on DioError catch (e) {
         throw RestException(
           message: "Erro que caiu no DioError - Post", 
           statusCode: e.response?.statusCode ?? 500

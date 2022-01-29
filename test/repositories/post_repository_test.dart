@@ -686,28 +686,139 @@ void main() {
   // O id que vai pegar é da url, se for diferente ambos, o que vai persistir é o id da url
   group("Unit tests from method .update(Post post)", () {
 
-    test("Should update a new Post and return the Post with all the fields updated when status code from response is 200", () {
+    late final Post originalPost;
+    late final Post postToBeUpdated;
 
+    setUpAll(() {
+      originalPost = postsModel.first;
+      postToBeUpdated = originalPost.copyWith(
+        body: "Body editado",
+        title: "Title editado",
+      );
     });
 
-    test("Should return a Exception from the type RestException with the message 'Erro que não caiu no DioError e nem na Exception Geral - Post' and status code 232 when the status code from Response is in the range of 2xx and different than 200", () {
+    test("Should update a new Post and return the Post with all the fields updated when status code from response is 200", () async {
 
+      dioAdapter.onPut(
+        baseUrl + "/${postToBeUpdated.id}", 
+        (server) => server.reply(200, postToBeUpdated.toMap()),
+        data: postToBeUpdated.toMap()
+      );
+
+      var postUpdated = await postRepository.update(postToBeUpdated);
+
+      expect(postUpdated, allOf(
+        predicate((Post postUpdated) => postUpdated.id == postToBeUpdated.id),
+        predicate((Post postUpdated) => postUpdated.userId == postToBeUpdated.userId),
+        predicate((Post postUpdated) => postUpdated.title == postToBeUpdated.title),
+        predicate((Post postUpdated) => postUpdated.body == postToBeUpdated.body),
+      ));
     });
 
-    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when the status code from Response is different from de range of 2xx", () {
+    test("Should return a Exception from the type RestException with the message 'Erro que não caiu no DioError e nem na Exception Geral - Post' and status code 232 when the status code from Response is in the range of 2xx and different than 200", () async {
 
+      dioAdapter.onPut(
+        baseUrl + "/${postToBeUpdated.id}", 
+        (server) => server.reply(232, postToBeUpdated.toMap()),
+        data: postToBeUpdated.toMap()
+      );
+
+      expect(
+        () async => await postRepository.update(postToBeUpdated), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que não caiu no DioError e nem na Exception Geral - Post"),
+          predicate((RestException error) => error.statusCode == 232)
+        )
+      ));
     });
 
-    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 500 when thrown a DioError exception without status code", () {
+    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when the status code from Response is different from de range of 2xx", () async {
+      
+      dioAdapter.onPut(
+        baseUrl + "/${postToBeUpdated.id}", 
+        (server) => server.reply(345, postToBeUpdated.toMap()),
+        data: postToBeUpdated.toMap()
+      );
 
+      expect(
+        () async => await postRepository.update(postToBeUpdated), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 345)
+        )
+      ));
     });
 
-    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when thrown a DioError exception with status code 345", () {
+    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 500 when thrown a DioError exception without status code", () async {
 
+      dioAdapter.onPut(
+        baseUrl + "/${postToBeUpdated.id}", 
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl + "/${postToBeUpdated.id}"
+          ),
+        )),
+        data: postToBeUpdated.toMap()
+      );
+
+      expect(
+        () async => await postRepository.update(postToBeUpdated), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 500)
+        )
+      ));
     });
 
-    test("Should returna a Exception from type RestException with the message 'Erro que caiu na Exception Geral - Post' and status code 500 when the data from response is not what is expected in Post.fromMap", () {
+    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when thrown a DioError exception with status code 345", () async {
 
+      dioAdapter.onPut(
+        baseUrl + "/${postToBeUpdated.id}", 
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl + "/${postToBeUpdated.id}"
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl + "/${postToBeUpdated.id}"
+            ),
+            statusCode: 345
+          ),
+        )),
+        data: postToBeUpdated.toMap()
+      );
+
+      expect(
+        () async => await postRepository.update(postToBeUpdated), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 345)
+        )
+      ));
+    });
+
+    test("Should returna a Exception from type RestException with the message 'Erro que caiu na Exception Geral - Post' and status code 500 when the data from response is not what is expected in Post.fromMap", () async {
+
+      dioAdapter.onPut(
+        baseUrl + "/${postToBeUpdated.id}", 
+        (server) => server.reply(200, {
+          "fake": 1
+        }),
+        data: postToBeUpdated.toMap()
+      );
+
+      expect(
+        () async => await postRepository.update(postToBeUpdated), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu na Exception Geral - Post"),
+          predicate((RestException error) => error.statusCode == 500)
+        )
+      ));
     });
   });
 
