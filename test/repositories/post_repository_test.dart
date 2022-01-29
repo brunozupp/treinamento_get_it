@@ -628,10 +628,58 @@ void main() {
 
     test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when thrown a DioError exception with status code 345", () {
 
+      final Post post = postsModel.first;
+
+      var map = post.toMap()..remove("id");
+
+      dioAdapter.onPost(
+        baseUrl, 
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl
+            ),
+            statusCode: 345
+          )
+        )),
+        data: map,
+      );
+
+      expect(
+        () async => await postRepository.insert(post), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 345)
+        )),
+      );
     });
 
     test("Should returna a Exception from type RestException with the message 'Erro que caiu na Exception Geral - Post' and status code 500 when the data from response is not what is expected in Post.fromMap", () {
 
+      final Post post = postsModel.first;
+
+      var map = post.toMap()..remove("id");
+
+      dioAdapter.onPost(
+        baseUrl, 
+        (server) => server.reply(201, {
+          "fake": 1
+        }),
+        data: map,
+      );
+
+      expect(
+        () async => await postRepository.insert(post), 
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu na Exception Geral - Post"),
+          predicate((RestException error) => error.statusCode == 500)
+        )),
+      );
     });
   });
   
