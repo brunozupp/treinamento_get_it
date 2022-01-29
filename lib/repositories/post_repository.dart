@@ -51,6 +51,8 @@ class PostRepository implements IPostRepository {
     }
   }
 
+  // O método delete, por não ter uma serialização após o retorno da requisição não vai precisar
+  // de um catch geral para tratar isso
   @override
   Future<bool> delete(int id) async {
     
@@ -67,6 +69,8 @@ class PostRepository implements IPostRepository {
 
       return true;
 
+    } on RestException {
+      rethrow;
     } on DioError catch (e) {
 
       if(e.response != null && e.response!.statusCode == 404) {
@@ -79,11 +83,6 @@ class PostRepository implements IPostRepository {
       throw RestException(
         message: "Erro que caiu no DioError - Post", 
         statusCode: e.response?.statusCode ?? 500
-      );
-    } catch (e) {
-      throw RestException(
-        message: "Erro que caiu na Exception Geral - Post", 
-        statusCode: 500
       );
     }
   }

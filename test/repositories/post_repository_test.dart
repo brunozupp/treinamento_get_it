@@ -824,36 +824,121 @@ void main() {
 
   group("Unit tests from method .delete(int id)", () {
 
-    test("Should return true when status code from Response is 200", () {
+    late final int id;
 
+    setUpAll(() {
+      id = 1;
     });
 
-    test("Should return a Exception from the type RestException with the message 'Erro que não caiu no DioError e nem na Exception Geral - Post' and status code 232 when the status code from Response is in the range of 2xx and different than 200", () {
+    test("Should return true when status code from Response is 200", () async {
 
+      dioAdapter.onDelete(
+        baseUrl + "/$id", 
+        (server) => server.reply(200, {})
+      );
+
+      var isDeleted = await postRepository.delete(id);
+
+      expect(isDeleted, equals(true));
     });
 
-    test("Should return a Exception from the type RestException with the message 'Post não foi encontrado' and status code 404 when the status code from Response is 404", () {
+    test("Should return a Exception from the type RestException with the message 'Erro que não caiu no DioError e nem na Exception Geral - Post' and status code 232 when the status code from Response is in the range of 2xx and different than 200", () async {
 
+      dioAdapter.onDelete(
+        baseUrl + "/$id", 
+        (server) => server.reply(232, {})
+      );
+
+      expect(
+        () async => await postRepository.delete(id),
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que não caiu no DioError e nem na Exception Geral - Post"),
+          predicate((RestException error) => error.statusCode == 232)
+        ))
+      );
     });
 
-    test("Should return a Exception from the type RestException with the message 'Post não foi encontrado' and status code 404 when not passed the id in url by throwing a exception with code 404", () {
+    test("Should return a Exception from the type RestException with the message 'Post não foi encontrado' and status code 404 when the status code from Response is 404", () async {
 
+      dioAdapter.onDelete(
+        baseUrl + "/$id", 
+        (server) => server.reply(404, {})
+      );
+
+      expect(
+        () async => await postRepository.delete(id),
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Post não foi encontrado"),
+          predicate((RestException error) => error.statusCode == 404)
+        ))
+      );
     });
 
-    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when the status code from Response is different from de range of 2xx", () {
+    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when the status code from Response is different from de range of 2xx", () async {
 
+      dioAdapter.onDelete(
+        baseUrl + "/$id", 
+        (server) => server.reply(345, {})
+      );
+
+      expect(
+        () async => await postRepository.delete(id),
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 345)
+        ))
+      );
     });
 
-    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 500 when thrown a DioError exception without status code", () {
+    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 500 when thrown a DioError exception without status code", () async {
 
+      dioAdapter.onDelete(
+        baseUrl + "/$id", 
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl + "/$id"
+          ),
+        )),
+      );
+
+      expect(
+        () async => await postRepository.delete(id),
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 500)
+        ))
+      );
     });
 
-    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when thrown a DioError exception with status code 345", () {
+    test("Should return a Exception from type RestException with the message 'Erro que caiu no DioError - Post' and status code 345 when thrown a DioError exception with status code 345", () async {
 
-    });
+      dioAdapter.onDelete(
+        baseUrl + "/$id", 
+        (server) => server.throws(345, DioError(
+          requestOptions: RequestOptions(
+            path: baseUrl + "/$id"
+          ),
+          response: Response(
+            requestOptions: RequestOptions(
+              path: baseUrl + "/$id"
+            ),
+            statusCode: 345
+          ),
+        )),
+      );
 
-    test("Should returna a Exception from type RestException with the message 'Erro que caiu na Exception Geral - Post' and status code 500 when the data from response is not what is expected in Post.fromMap", () {
-
+      expect(
+        () async => await postRepository.delete(id),
+        throwsA(allOf(
+          isA<RestException>(),
+          predicate((RestException error) => error.message == "Erro que caiu no DioError - Post"),
+          predicate((RestException error) => error.statusCode == 345)
+        ))
+      );
     });
   });
 }
