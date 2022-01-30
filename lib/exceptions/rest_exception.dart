@@ -1,10 +1,11 @@
-class RestException implements Exception {
+import 'package:treinamento_get_it/exceptions/base_exception.dart';
 
-  final String message;
+class RestException extends BaseException {
+
   final int statusCode;
   
   RestException({
-    required this.message,
+    required String message,
     required this.statusCode,
-  });
+  }) : super(message: message);
 }
