@@ -1,4 +1,5 @@
 import 'package:mobx/mobx.dart';
+import 'package:treinamento_get_it/exceptions/base_exception.dart';
 import 'package:treinamento_get_it/models/entities/post.dart';
 part 'post_list_store.g.dart';
 
@@ -13,7 +14,7 @@ abstract class _PostListStoreBase with Store {
   bool isLoading = false;
 
   @observable
-  String? error;
+  BaseException? error;
 
   @action 
   void setPosts(List<Post> value) {
@@ -30,8 +31,8 @@ abstract class _PostListStoreBase with Store {
     isLoading = value;
   }
 
-  @action 
-  void setError(String? value) {
+  @action
+  void setError(BaseException value) {
     error = value;
   }
 

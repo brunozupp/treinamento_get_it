@@ -42,13 +42,13 @@ mixin _$PostListStore on _PostListStoreBase, Store {
   final _$errorAtom = Atom(name: '_PostListStoreBase.error');
 
   @override
-  String? get error {
+  BaseException? get error {
     _$errorAtom.reportRead();
     return super.error;
   }
 
   @override
-  set error(String? value) {
+  set error(BaseException? value) {
     _$errorAtom.reportWrite(value, super.error, () {
       super.error = value;
     });
@@ -91,7 +91,7 @@ mixin _$PostListStore on _PostListStoreBase, Store {
   }
 
   @override
-  void setError(String? value) {
+  void setError(BaseException value) {
     final _$actionInfo = _$_PostListStoreBaseActionController.startAction(
         name: '_PostListStoreBase.setError');
     try {

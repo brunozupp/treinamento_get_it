@@ -4,6 +4,7 @@
 
 import 'package:mobx/mobx.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:treinamento_get_it/exceptions/base_exception.dart' as _i5;
 import 'package:treinamento_get_it/models/entities/post.dart' as _i4;
 import 'package:treinamento_get_it/pages/post/post_list/store/post_list_store.dart'
     as _i3;
@@ -46,7 +47,7 @@ class MockPostListStore extends _i1.Mock implements _i3.PostListStore {
       super.noSuchMethod(Invocation.setter(#isLoading, _isLoading),
           returnValueForMissingStub: null);
   @override
-  set error(String? _error) =>
+  set error(_i5.BaseException? _error) =>
       super.noSuchMethod(Invocation.setter(#error, _error),
           returnValueForMissingStub: null);
   @override
@@ -61,7 +62,7 @@ class MockPostListStore extends _i1.Mock implements _i3.PostListStore {
       super.noSuchMethod(Invocation.method(#setLoading, [value]),
           returnValueForMissingStub: null);
   @override
-  void setError(String? value) =>
+  void setError(_i5.BaseException? value) =>
       super.noSuchMethod(Invocation.method(#setError, [value]),
           returnValueForMissingStub: null);
   @override

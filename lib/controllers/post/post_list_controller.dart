@@ -31,7 +31,7 @@ class PostListController implements ControllerBase<PostListStore> {
       _postListStore.setPosts(posts);
 
     } on RestException catch (e) {
-      _postListStore.setError(e.message);
+      _postListStore.setError(e);
     } finally {
       _postListStore.setLoading(false);
     }
