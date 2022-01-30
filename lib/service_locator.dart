@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:treinamento_get_it/pages/post/stores/post_list_store/post_list_store.dart';
+import 'package:treinamento_get_it/pages/post/post_list/store/post_list_store.dart';
 import 'package:treinamento_get_it/repositories/interfaces/i_post_repository.dart';
 import 'package:treinamento_get_it/repositories/post_repository.dart';
 import 'package:treinamento_get_it/shared/rest_api/rest_api_service.dart';

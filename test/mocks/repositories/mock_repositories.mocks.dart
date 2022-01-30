@@ -50,6 +50,11 @@ class MockPostRepository extends _i1.Mock implements _i4.PostRepository {
       (super.noSuchMethod(Invocation.method(#update, [post]),
               returnValue: Future<_i2.Post>.value(_FakePost_0()))
           as _i5.Future<_i2.Post>);
+  @override
+  _i5.Future<_i2.Post> get(int? id) =>
+      (super.noSuchMethod(Invocation.method(#get, [id]),
+              returnValue: Future<_i2.Post>.value(_FakePost_0()))
+          as _i5.Future<_i2.Post>);
 }
 
 /// A class which mocks [UserRepository].

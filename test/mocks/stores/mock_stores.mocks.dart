@@ -5,7 +5,7 @@
 import 'package:mobx/mobx.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:treinamento_get_it/models/entities/post.dart' as _i4;
-import 'package:treinamento_get_it/pages/post/stores/post_list_store/post_list_store.dart'
+import 'package:treinamento_get_it/pages/post/post_list/store/post_list_store.dart'
     as _i3;
 
 // ignore_for_file: avoid_redundant_argument_values

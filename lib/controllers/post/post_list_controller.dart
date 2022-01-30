@@ -1,6 +1,6 @@
 import 'package:treinamento_get_it/controllers/controller_base.dart';
 import 'package:treinamento_get_it/exceptions/rest_exception.dart';
-import 'package:treinamento_get_it/pages/post/stores/post_list_store/post_list_store.dart';
+import 'package:treinamento_get_it/pages/post/post_list/store/post_list_store.dart';
 import 'package:treinamento_get_it/repositories/interfaces/i_post_repository.dart';
 
 class PostListController implements ControllerBase<PostListStore> {

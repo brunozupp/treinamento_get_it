@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:treinamento_get_it/controllers/post/post_list_controller.dart';
-import 'package:treinamento_get_it/pages/post/post_list_page.dart';
+import 'package:treinamento_get_it/pages/post/post_list/post_list_page.dart';
 
 import 'widgets/card_widget.dart';
 
