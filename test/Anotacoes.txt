@@ -31,3 +31,7 @@ no exemplo a seguir:
 
 1 - inserir informações erradas no data do response para ocorrer erro na serialização dos dados
 
+----------------------------------------------------
+
+Atenção com o objeto passado no data dos métodos do dioAdapter, eles precisam estar EXATAMENTE iguais ao
+que vai ser executado na camada que está sendo testada.
