@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:treinamento_get_it/exceptions/rest_exception.dart';
 import 'package:treinamento_get_it/models/entities/post.dart';
