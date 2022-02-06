@@ -12,20 +12,20 @@ exceção DioError explicitamente, o que me garante manipular os atributos dele,
 code de server.throws(435, DioError(...)) não é válido, caso queira o status code no DioError é preciso passar explicitamente como
 no exemplo a seguir:
 
-    dioAdapter.onGet(
-        baseUrl,
-        (server) => server.throws(432, DioError( // o status code dessa linha não é válido
-          requestOptions: RequestOptions(
-            path: baseUrl
-          ),
-          response: Response(
-            requestOptions: RequestOptions(
-              path: baseUrl
-            ),
-            statusCode: 432 // o status coide dessa linha que é válido
-          ),
-        )),
-      );
+dioAdapter.onGet(
+  baseUrl,
+  (server) => server.throws(432, DioError( // o status code dessa linha não é válido
+    requestOptions: RequestOptions(
+      path: baseUrl
+    ),
+    response: Response(
+      requestOptions: RequestOptions(
+        path: baseUrl
+      ),
+      statusCode: 432 // o status coide dessa linha que é válido
+    ),
+  )),
+);
 
 - Lançando erros para cair no catch Geral
 
@@ -35,3 +35,33 @@ no exemplo a seguir:
 
 Atenção com o objeto passado no data dos métodos do dioAdapter, eles precisam estar EXATAMENTE iguais ao
 que vai ser executado na camada que está sendo testada.
+
+----------------------------------------------------
+
+QUANDO USAR CLASSES MOCKADAS PARA TESTE?
+
+Quando eu quero ter o controle para verificar a quantidade de vezes que foi chamada a classe em questão
+e também para saber qual a ordem das chamadas. Um exemplo que pode ser visto é nos arquivos
+1 - test/controllers/post/post_list_controller_test.dart
+2 - test/controllers/post/post_list_controller_with_mock_test.dart
+
+No arquivo 1 está a Store pura, onde eu consigo acessar os VALORES de cada variável e usar o expect
+para verificar se os valores que eu espero estão corretos, como, por exemplo, verificar se a lista
+de posts não está vazia e verificar se o tamanho dela é compatível com a lista que é retornada 
+do repositório.
+
+No arquivo 2 está a Store Mockada, onde eu NÃO consigo acessar os VALORES de cada variável e se
+eu tentar usar  o expect vai dar o seguinte erro:
+
+(MissingStubError: 'posts'
+No stub was found which matches the arguments of this method call:
+posts
+Add a stub for this method using Mockito's 'when' API, or generate the mock for MockPostListStore with 'returnNullOnMissingStub: true'.)
+
+O que eu consigo fazer com essa store mockada é verificar se os métodos foram chamados utilizando 
+a contagem de execuções dos mesmos (verify(...).called(número de vezes)) e consigo também verificar
+a ordem na qual esses métodos estão sendo chamados.
+
+O que pode fazer é ter dois grupos de teste de uma controller. Um destinado a controller receber
+uma store real para verificar os valores e outro grupo onde a controller recebe a store mockada
+para fazer as verificações de número e ordem de execução.

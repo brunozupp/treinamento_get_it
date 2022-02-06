@@ -37,7 +37,6 @@ class PostRepository implements IPostRepository {
         );
       }
       
-      // TODO: Verificar as estruturas do Dio sobre status code e sua relação com o estouro de uma exceção DioError
       throw RestException(
         message: "Status code (${e.response!.statusCode}) não corresponde ao esperado (200)", 
         statusCode: e.response!.statusCode!
@@ -191,7 +190,6 @@ class PostRepository implements IPostRepository {
         );
       }
       
-      // TODO: Verificar as estruturas do Dio sobre status code e sua relação com o estouro de uma exceção DioError
       throw RestException(
         message: "Status code (${e.response!.statusCode}) não corresponde ao esperado (200)", 
         statusCode: e.response!.statusCode!
