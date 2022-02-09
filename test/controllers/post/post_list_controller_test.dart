@@ -11,16 +11,15 @@ import '../../mocks/repositories/mock_repositories.mocks.dart';
 
 void main() {
 
-  late final IPostRepository repository;
+  late IPostRepository repository;
   late PostListController controller;
-
-  setUpAll(() {
-    repository = MockPostRepository();
-  });
 
   group("Unit test from method .getAll()", () {
 
     setUp(() {
+
+      repository = MockPostRepository();
+
       controller = PostListController(
         postListStore: PostListStore(),
         postRepository: repository

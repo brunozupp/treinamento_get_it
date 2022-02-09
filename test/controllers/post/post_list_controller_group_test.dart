@@ -25,14 +25,12 @@ void main() {
 
   group("Unit test from method .getAll() using a real store", () {
 
-    setUpAll(() {
-      repository = MockPostRepository();
-    });
-
     setUp(() {
+      repository = MockPostRepository();
+
       controller = PostListController(
         postListStore: PostListStore(),
-        postRepository: repository
+        postRepository: repository,
       );
     });
 
@@ -76,11 +74,10 @@ void main() {
 
   group("Unit test from method .getAll() using a Mocked Store", () {
 
-    setUpAll(() {
-      repository = MockPostRepository();
-    });
-
     setUp(() {
+
+      repository = MockPostRepository();
+
       controller = PostListController(
         postListStore: MockPostListStore(),
         postRepository: repository
